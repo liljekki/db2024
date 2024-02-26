@@ -1,13 +1,15 @@
 -- Приклад 1
-SELECT * FROM "Order";
--- Вивести всі замовлення.
+SELECT "Customer".name, "Order".date
+FROM "Customer"
+JOIN "Order" ON "Customer".customer_id = "Order".customer_id;
+-- Отримайти імена клієнтів і відповідні дати їх замовлень.
 
 -- Приклад 2
 SELECT name, price FROM "Product";
 -- Показати назви та ціни продуктів.
 
 -- Приклад 3
-SELECT * FROM "Customer" WHERE email = 'example@email.com';
+SELECT * FROM "Customer" WHERE email = 'alice@example.com';
 -- Знайти клієнта за електронною поштою.
 
 -- Приклад 4
@@ -56,8 +58,10 @@ WHERE
 -- Оновити кількість товарів у замовленні.
 
 -- Приклад 12
-DELETE FROM "Product" WHERE price < 5.00;
--- Видалити продукти, які коштують менше 5.00.
+SELECT "Order".order_id, "Order".date, "Order".total_amount, "Customer".name
+FROM "Order"
+JOIN "Customer" ON "Order".customer_id = "Customer".customer_id;
+-- Отримати деталі кожного замовлення разом із загальною сумою:
 
 -- Приклад 13
 SELECT AVG(total_amount) FROM "Order";
@@ -262,7 +266,7 @@ DELETE FROM "Product" WHERE name LIKE '%Burger%';
 -- Видалити продукти з назвою, що містить "Burger".
 
 -- Приклад 54
-SELECT * FROM "Order" WHERE date = '2024-02-10';
+SELECT * FROM "Order" WHERE date = '2024-02-07';
 -- Показати замовлення на певну дату.
 
 -- Приклад 55
@@ -516,8 +520,12 @@ UPDATE "Customer" SET name = 'Bob Doe' WHERE name = 'Bob Johnson';
 -- Оновити ім'я клієнта за ім'ям.
 
 -- Приклад 98
-DELETE FROM "Product" WHERE name IN ('French Fries', 'Iced Coffee');
--- Видалити продукти за конкретними назвами.
+SELECT "Customer".name, "Product".name as product_name, "Order_Product".quantity
+FROM "Customer"
+JOIN "Order" ON "Customer".customer_id = "Order".customer_id
+JOIN "Order_Product" ON "Order".order_id = "Order_Product".order_id
+JOIN "Product" ON "Order_Product".product_id = "Product".product_id;
+-- Вивід назв та кількость з використанням JOIN
 
 -- Приклад 99
 SELECT *
@@ -536,3 +544,50 @@ INSERT INTO
     )
 VALUES (8, 12, 1);
 -- Додати товар до замовлення.
+
+
+SELECT SUM(total_amount) as total
+FROM "Order"
+WHERE customer_id = 1
+AND "date" BETWEEN '2024-02-19' AND '2024-02-04';
+
+SELECT * FROM "Order"
+
+
+
+SELECT SUM(total_amount) as total
+FROM "Order"
+WHERE customer_id = 1
+AND "date" BETWEEN '2024-02-04' AND '2024-02-19';
+
+
+
+
+
+
+--------------------------------------------------------
+
+
+SELECT customer_id, SUM(total_amount) as total_spent
+FROM "Order"
+GROUP BY customer_id;
+-- Загальна сума замовлень для кожного клієнта:
+
+SELECT customer_id, AVG(total_amount) as avg_order
+FROM "Order"
+GROUP BY
+    customer_id
+HAVING
+    AVG(total_amount) > 20;
+-- Середній чек для кожного клієнта, який витратив більше 20 : 
+
+
+SELECT customer_id, COUNT(DISTINCT order_id) as order_count
+FROM "Order"
+GROUP BY
+    customer_id
+HAVING
+    COUNT(DISTINCT order_id) > 1;
+-- Кількість клієнтів, які здійснили більше одного замовлення:
+
+
