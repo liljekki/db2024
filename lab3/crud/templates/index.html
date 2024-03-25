@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Orders</h2>
+
+    <div class="container">
+        <button onclick="showForm()">Add New Order</button>
+        <div id="orderForm" style="display: none;">
+            <h3>Add New Order</h3>
+            <form id="addOrderForm">
+                <label for="customer_id">Customer ID:</label>
+                <input type="text" id="customer_id" name="customer_id"><br><br>
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date"><br><br>
+                <label for="total_amount">Total Amount:</label>
+                <input type="text" id="total_amount" name="total_amount"><br><br>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+
+        <br><br>
+
+        <table id="ordersTable">
+            <tr>
+                <th>Order ID</th>
+                <th>Customer ID</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Actions</th>
+            </tr>
+            <!-- Orders will be dynamically inserted here -->
+        </table>
+    </div>
+
+    <script>
+        // JavaScript для обработки формы и отображения списка заказов
+
+        // Функция для отображения формы добавления заказа
+        function showForm() {
+            var form = document.getElementById('orderForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        // Функция для отправки данных формы добавления заказа
+        document.getElementById('addOrderForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Предотвращаем стандартное поведение формы
+            var formData = new FormData(this);
+
+            fetch('/orders', {
+                method: 'POST',
+                body: JSON.stringify({
+                    customer_id: formData.get('customer_id'),
+                    date: formData.get('date'),
+                    total_amount: formData.get('total_amount')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Перезагрузка страницы для отображения нового заказа
+                    window.location.reload();
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Функция для загрузки списка заказов при загрузке страницы
+        window.onload = function () {
+            fetch('/orders')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    var ordersTable = document.getElementById('ordersTable');
+                    data.forEach(order => {
+                        var row = `<tr>
+                               <td>${order.order_id}</td>
+                               <td>${order.customer_id}</td>
+                               <td>${order.date}</td>
+                               <td>${order.total_amount}</td>
+                               <td><button onclick="deleteOrder(${order.order_id})">Delete</button></td>
+                           </tr>`;
+                        ordersTable.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        };
+
+        // Функция для удаления заказа
+        function deleteOrder(orderId) {
+            fetch(`/orders/${orderId}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Перезагрузка страницы для обновления списка заказов
+                    window.location.reload();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+
+</html>

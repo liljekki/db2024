@@ -1,6 +1,9 @@
-CREATE OR REPLACE PROCEDURE p_insert_order(customer_id_param 
-INT, date_param DATE, total_amount_param DECIMAL(10, 2
-)) 
+-- Процедура для вставки нового замовлення в "Order"
+CREATE OR REPLACE PROCEDURE insert_order(
+	customer_id_param INT, 
+	date_param DATE, 
+	total_amount_param DECIMAL(10, 2)
+	) 
 LANGUAGE plpgsql AS 
 $$
 BEGIN
@@ -13,11 +16,15 @@ BEGIN
 	    );
 END;
 $$; 
-CALL p_insert_order (1, '2024-03-11', 25.99);
 
+-- Виклик першої процедури
+CALL insert_order (1, '2024-03-24', 299);
 
-CREATE OR REPLACE PROCEDURE p_insert_product(name_param 
-VARCHAR(255), price_param DECIMAL(10, 2)) 
+-- Процедура для вставки нового продукту в "Product"
+CREATE OR REPLACE PROCEDURE insert_product(
+	name_param VARCHAR(255), 
+	price_param DECIMAL(10, 2)
+	) 
 LANGUAGE plpgsql AS 
 $$
 BEGIN
@@ -26,16 +33,25 @@ BEGIN
 	VALUES (name_param, price_param);
 END;
 $$; 
-CALL p_insert_product ('Cheeseburger', 4.99);
 
+-- Виклик другої процедури
+CALL insert_product ('Cheeseburger_2', 4.99);
 
-CREATE OR REPLACE PROCEDURE p_delete_order_by_id(order_id_param 
-INT) 
+-- Процедура для видалення замовлення по id
+CREATE OR REPLACE PROCEDURE delete_order(
+	order_id_param INT) 
 LANGUAGE plpgsql AS 
 $$
 BEGIN
-	DELETE FROM "Order" WHERE order_id = order_id_param;
+	DELETE FROM "Order"
+	WHERE
+	    order_id = order_id_param;
 END;
 $$; 
-CALL p_delete_order_by_id (1);
 
+-- Виклик третьої процедури 
+CALL delete_order (10);
+
+
+SELECT * FROM "Order";
+SELECT * FROM "Product";
