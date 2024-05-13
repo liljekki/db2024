@@ -1,0 +1,44 @@
+db.prod.find()
+db.prod.find({ "name": "Big Mac" })
+db.prod.find({ "price": "5" })
+db.prod.find({ "product_id": "001" })
+db.prod.find({ "name": "Product B" })
+db.prod.insertOne({
+    "name": "Big Mac",
+    "price": "3.99",
+    "product_id": "005"
+})
+db.prod.insertMany([
+    {
+        "name": "Product A",
+        "price": "1.99",
+        "product_id": "006"
+    },
+    {
+        "name": "Product B",
+        "price": "2.99",
+        "product_id": "007"
+    }
+])
+db.prod.updateOne(
+    { "name": "New Product" },
+    { $set: { "price": "4.99" } }
+)
+db.prod.updateMany(
+    { "price": "2" },
+    { $set: { "price": "2.50" } }
+)
+db.prod.deleteOne({ "name": "New Product" })
+db.prod.deleteMany({ "name": "New Product" })
+db.prod.find().limit(5)
+db.prod.find().skip(10).limit(5)
+db.prod.distinct("name")
+db.prod.countDocuments()
+db.prod.find({ "name": /mac/i })
+db.prod.aggregate([
+    { $group: { _id: "$name", count: { $sum: 1 } } }
+])
+db.prod.aggregate([
+    { $addFields: { convertedPrice: { $toDouble: "$price" } } },
+    { $sort: { convertedPrice: 1 } }
+])
